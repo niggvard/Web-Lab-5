@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Tasks</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .header {
+            background-color: #cce0ff;
+            padding: 20px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+        }
+
+        .left {
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .left-top {
+            background-color: #ffe6cc;
+            flex: 1;
+            padding: 10px;
+        }
+
+        .left-bottom {
+            background-color: #e6ffe6;
+            flex: 1;
+            padding: 10px;
+        }
+
+        .main {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 10px;
+        }
+
+        .right {
+            width: 25%;
+            background-color: #ffe6cc;
+            padding: 10px;
+        }
+
+        .footer {
+            background-color: #cce0ff;
+            text-align: left;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        ul li {
+            margin: 5px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #0066cc;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="block-x" class="header">Потеряйко Арсен</div>
+        <div class="content">
+            <div class="left">
+                <div id="block-2" class="left-top">
+                    <input id="color-input" type="text" placeholder="Введіть колір" />
+                </div>
+                <div id="block-5" class="left-bottom"></div>
+            </div>
+
+            <div id="block-3" class="main">
+                <form id="form-3" style="display: none;">
+                    <label for="form-values">Введіть 10 чисел через кому:</label>
+                    <input id="form-values" type="text">
+                    <button type="button" onclick="findMaxNumbers()">Обчислити</button>
+                </form>
+            </div>
+
+            <div id="block-4" class="right"></div>
+        </div>
+        <div id="block-y" class="footer">ІП-з31</div>
+    </div>
+
+    <script>
+        // 1. Поміняйте місцями контент блоків «Х» та «У»
+        function swapBlocks() {
+            const blockX = document.querySelector('#block-x');
+            const blockY = document.querySelector('#block-y');
+            const tempContent = blockX.innerHTML;
+            blockX.innerHTML = blockY.innerHTML;
+            blockY.innerHTML = tempContent;
+        }
+
+        swapBlocks();
+
+        // 2. Функція обчислення площі кола
+        function calculateCircleArea() {
+            const radius = 5; // Змініть на необхідне значення
+            const area = Math.PI * Math.pow(radius, 2);
+            const block3 = document.querySelector('#block-3');
+            const result = document.createElement('div');
+            result.innerText = `Площа кола з радіусом ${radius}: ${area.toFixed(2)}`;
+            block3.appendChild(result);
+        }
+
+        calculateCircleArea();
+
+        // 3. Сценарій для обчислення кількості максимальних чисел
+        function findMaxNumbers() {
+            const formValues = document.querySelector('#form-values').value.split(',').map(Number);
+            const max = Math.max(...formValues);
+            const maxCount = formValues.filter(num => num === max).length;
+
+            document.cookie = `maxCount=${maxCount}; path=/;`;
+
+            alert(`Кількість максимальних чисел: ${maxCount}`);
+        }
+
+        function handleCookies() {
+            const cookies = document.cookie.split('; ').find(row => row.startsWith('maxCount='));
+            if (cookies) {
+                const maxCount = cookies.split('=')[1];
+                const confirmDelete = confirm(`Збережені дані: ${maxCount}. Видалити cookies?`);
+                if (confirmDelete) {
+                    document.cookie = `maxCount=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+                    location.reload();
+                } else {
+                    alert('Cookies збережено. Перезавантажте сторінку.');
+                }
+            } else {
+                document.querySelector('#form-3').style.display = 'block';
+            }
+        }
+
+        handleCookies();
+
+        // 4. Подія blur для зміни кольору фону блоку «2»
+        document.querySelector('#color-input').addEventListener('blur', function () {
+            const newColor = this.value;
+            const block2 = document.querySelector('#block-2');
+            block2.style.backgroundColor = newColor;
+            localStorage.setItem('block2Color', newColor);
+        });
+
+        window.addEventListener('load', () => {
+            const savedColor = localStorage.getItem('block2Color');
+            if (savedColor) {
+                document.querySelector('#block-2').style.backgroundColor = savedColor;
+            }
+        });
+
+        // 5. Редагування вмісту блоків
+        function enableEditing(blockId) {
+            const block = document.querySelector(blockId);
+            const initialContent = block.innerHTML;
+
+            const input = document.createElement('textarea');
+            const saveButton = document.createElement('button');
+            const deleteButton = document.createElement('button');
+
+            input.value = initialContent;
+            saveButton.innerText = 'Зберегти';
+            deleteButton.innerText = 'Видалити';
+
+            saveButton.addEventListener('click', () => {
+                const newContent = input.value;
+                block.innerHTML = newContent;
+                localStorage.setItem(blockId, newContent);
+                block.style.backgroundColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+            });
+
+            deleteButton.addEventListener('click', () => {
+                localStorage.removeItem(blockId);
+                block.innerHTML = initialContent;
+            });
+
+            block.innerHTML = '';
+            block.appendChild(input);
+            block.appendChild(saveButton);
+            block.appendChild(deleteButton);
+        }
+
+        ['#block-x', '#block-y', '#block-3', '#block-4', '#block-2'].forEach(blockId => {
+            const block = document.querySelector(blockId);
+            block.addEventListener('dblclick', () => enableEditing(blockId));
+        });
+    </script>
+</body>
+</html>
